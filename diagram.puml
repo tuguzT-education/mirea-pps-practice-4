@@ -1,0 +1,69 @@
+@startuml Архитектурная диаграмма "Flexible Project"
+!include <c4/C4_Container.puml>
+
+!include <office/Users/mobile_user.puml>
+
+!define SPRITES https://raw.githubusercontent.com/tupadr3/plantuml-icon-font-sprites/master
+!define DEVICONS SPRITES/devicons2
+!define FONTAWESOME SPRITES/font-awesome-5
+
+!include DEVICONS/rust.puml
+!include DEVICONS/android.puml
+!include DEVICONS/mongodb.puml
+!include DEVICONS/kotlin.puml
+!include DEVICONS/google.puml
+!include DEVICONS/github_original.puml
+
+'LAYOUT_TOP_DOWN()
+'LAYOUT_AS_SKETCH()
+LAYOUT_WITH_LEGEND()
+
+title Архитектурная диаграмма "Flexible Project"
+
+Person(person, "Пользователь", "Пользователь клиентского приложения", $sprite="mobile_user")
+
+System(mobile, "Клиентское приложение", "Интерфейс, с которым взаимодействует пользователь", $sprite="android")
+System_Boundary(c1, "Серверная система") {
+    Container(gateway, "API-шлюз", "Rust, actix-web, Docker Container", "Предоставляет функциональность сервера клиенту посредством API", $sprite="rust")
+    Container(users, "Управление пользователями", "Rust, actix-web, Docker Container", "Микросервис, предоставляющий функциональность работы с пользователями", $sprite="rust")
+    Container(workspaces, "Управление рабочими пространствами", "Rust, actix-web, Docker Container", "Микросервис, предоставляющий функциональность работы с рабочими пространствами", $sprite="rust")
+    Container(projects, "Управление проектами", "Rust, actix-web, Docker Container", "Микросервис, предоставляющий функциональность работы с проектами", $sprite="rust")
+    Container(methodologies, "Управление методологиями", "Rust, actix-web, Docker Container", "Микросервис, предоставляющий функциональность работы с методологиями разработки проектов", $sprite="rust")
+    Container(stages, "Управление стадиями разработки проектов", "Rust, actix-web, Docker Container", "Микросервис, предоставляющий функциональность работы со стадиями разработки проектов", $sprite="rust")
+    Container(tasks, "Управление задачами проектов", "Rust, actix-web, Docker Container", "Микросервис, предоставляющий функциональность работы с задачами проектов", $sprite="rust")
+    Container(notifications, "Управление уведомлениями", "Rust, actix-web, Docker Container", "Микросервис, предоставляющий функциональность работы с уведомлениями", $sprite="rust")
+
+    ContainerDb(usersDb, "СУБД сервиса пользователей", "MongoDB, Docker Container", "Обработка постоянных данных пользователей системы", $sprite="mongodb")
+    ContainerDb(workspacesDb, "СУБД сервиса рабочих пространств", "MongoDB, Docker Container", "Обработка постоянных данных рабочих пространств системы", $sprite="mongodb")
+    ContainerDb(projectsDb, "СУБД сервиса проектов", "MongoDB, Docker Container", "Обработка постоянных данных проектов системы", $sprite="mongodb")
+    ContainerDb(methodologiesDb, "СУБД сервиса методологий проектов", "MongoDB, Docker Container", "Обработка постоянных данных методологий системы", $sprite="mongodb")
+    ContainerDb(stagesDb, "СУБД сервиса стадий разработки проектов", "MongoDB, Docker Container", "Обработка постоянных данных стадий разработки проектов системы", $sprite="mongodb")
+    ContainerDb(tasksDb, "СУБД сервиса задач проектов", "MongoDB, Docker Container", "Обработка постоянных данных задач проектов системы", $sprite="mongodb")
+    ContainerDb(notificationsDb, "СУБД сервиса уведомлений", "MongoDB, Docker Container", "Обработка постоянных данных уведомлений системы", $sprite="mongodb")
+}
+
+System_Ext(google, "Google", "Сервис авторизации Google", $sprite="google")
+System_Ext(github, "GitHub", "Сервис авторизации GitHub", $sprite="github_original")
+
+Rel_Right(person, mobile, "Использует (взаимодействует с элементами интерфейса)", "")
+Rel(mobile, gateway, "Запросы GraphQL", "HTTPS, WS")
+Rel(gateway, users, "Работа с пользователями", "HTTPS")
+Rel(gateway, workspaces, "Работа с рабочими пространствами", "HTTPS")
+Rel(gateway, projects, "Работа с проектами", "HTTPS")
+Rel(gateway, methodologies, "Работа с методологиями проектов", "HTTPS")
+Rel(gateway, stages, "Работа со стадиями разработки проектов", "HTTPS")
+Rel(gateway, tasks, "Работа с задачами проектов", "HTTPS")
+Rel(gateway, notifications, "Работа с уведомлениями", "HTTPS")
+
+Rel(users, usersDb, "Работа с данными пользователей", "MongoDB Wire Protocol")
+Rel(workspaces, workspacesDb, "Работа с данными рабочих пространств", "MongoDB Wire Protocol")
+Rel(projects, projectsDb, "Работа с данными проектов", "MongoDB Wire Protocol")
+Rel(methodologies, methodologiesDb, "Работа с данными методологий проектов", "MongoDB Wire Protocol")
+Rel(stages, stagesDb, "Работа с данными стадий разработки проектов", "MongoDB Wire Protocol")
+Rel(tasks, tasksDb, "Работа с данными задач проектов", "MongoDB Wire Protocol")
+Rel(notifications, notificationsDb, "Работа с данными уведомлений", "MongoDB Wire Protocol")
+
+Rel(users, google, "Авторизация через API Google", "HTTPS")
+Rel(users, github, "Авторизация через API GitHub", "HTTPS")
+
+@enduml
